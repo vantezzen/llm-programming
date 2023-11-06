@@ -99,7 +99,7 @@ function ChatLayout({ children }: { children: React.ReactNode }) {
             +
           </Button>
         </aside>
-        <main className="w-full">{children}</main>
+        <main className="w-full overflow-x-auto">{children}</main>
       </div>
     </div>
   );
