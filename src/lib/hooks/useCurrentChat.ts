@@ -1,5 +1,4 @@
-import { useLocalStorage } from "usehooks-ts";
-import { Chat, ChatHistory } from "../types";
+import { Chat } from "../types";
 import useChatHistory from "./useChatHistory";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";

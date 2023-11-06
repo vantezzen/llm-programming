@@ -3,7 +3,6 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Check, Loader2, SquareCode, X } from "lucide-react";
-import { ScrollArea } from "../ui/scroll-area";
 import { Progress } from "../ui/progress";
 
 function ChatModelResponse({ response }: { response: ModelResponse }) {

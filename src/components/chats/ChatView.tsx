@@ -1,16 +1,7 @@
 import useCurrentChat from "@/lib/hooks/useCurrentChat";
 import React, { useState } from "react";
-import { Textarea } from "../ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
-import { Button } from "../ui/button";
+
+
 import ChatPromptForm from "./ChatPromptForm";
 import ChatModelResponse from "./ChatModelResponse";
 import ChatRunner from "@/lib/chatRunner/ChatRunner";
@@ -34,9 +25,14 @@ function ChatView() {
       <ChatPromptForm
         onStart={() => {
           setIsRunning(true);
-          chatRunner.runChat(currentChat!, forceUpdate).then(() => {
-            setIsRunning(false);
-          });
+          chatRunner
+            .runChat(currentChat!, () => {
+              setCurrentChat(currentChat!);
+              forceUpdate();
+            })
+            .then(() => {
+              setIsRunning(false);
+            });
         }}
         isRunning={isRunning}
       />

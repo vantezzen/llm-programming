@@ -12,7 +12,6 @@ import {
 } from "../ui/select";
 import { Button } from "../ui/button";
 import { DataSet, DataSets } from "@/lib/types";
-import ChatRunner from "@/lib/chatRunner/ChatRunner";
 import { Slider } from "../ui/slider";
 import DatasetManager from "@/lib/chatRunner/DatasetManager";
 

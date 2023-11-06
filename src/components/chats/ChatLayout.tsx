@@ -1,10 +1,6 @@
 "use client";
-import { ChatHistory } from "@/lib/types";
 import React from "react";
-import { useLocalStorage } from "usehooks-ts";
 import { Button } from "../ui/button";
-import { Textarea } from "../ui/textarea";
-import { Select, SelectTrigger, SelectValue } from "../ui/select";
 import { v4 as uuid } from "uuid";
 import useChatHistory from "@/lib/hooks/useChatHistory";
 import useCurrentChat, { useSetCurrentChat } from "@/lib/hooks/useCurrentChat";

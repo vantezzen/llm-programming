@@ -1,4 +1,4 @@
-import type { loadPyodide, PyodideInterface } from "pyodide";
+import type { PyodideInterface } from "pyodide";
 
 declare global {
   interface Window {
