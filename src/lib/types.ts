@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const DataSets = ["MBPP"] as const;
 export type DataSet = (typeof DataSets)[number];
-export const Models = ["GPT2", "GPT3"] as const;
+export const Models = ["GPT3"] as const;
 export type Model = (typeof Models)[number];
 
 export const ModelChallengeResponseSchema = z.object({
@@ -28,6 +28,7 @@ export const ChatSchema = z.object({
 
   prompt: z.string(),
   dataset: z.enum(DataSets),
+  challengeLimit: z.number(),
   models: z.array(ModelResponseSchema),
 
   createdAt: z.coerce.date(),
@@ -45,5 +46,6 @@ export const ChallengeSchema = z.object({
     setupCode: z.string(),
     testList: z.array(z.string()),
   }),
+  suggestedCode: z.string().optional(),
 });
 export type Challenge = z.infer<typeof ChallengeSchema>;

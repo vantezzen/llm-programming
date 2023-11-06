@@ -90,6 +90,7 @@ function ChatLayout({ children }: { children: React.ReactNode }) {
 
                     prompt: "",
                     dataset: "MBPP",
+                    challengeLimit: -1,
                     models: [],
 
                     createdAt: new Date(),

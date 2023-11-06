@@ -5,7 +5,9 @@ import {
   ModelChallengeResponse,
   ModelResponse,
 } from "../types";
+import CodeExecutor from "./CodeExecutor";
 import DatasetManager from "./DatasetManager";
+import PromptTemplate from "./PromptTemplate";
 
 export default class ChatWorker {
   constructor(
@@ -16,7 +18,7 @@ export default class ChatWorker {
 
   async run() {
     const datasetManager = new DatasetManager(this.chat.dataset);
-    const challenges = datasetManager.getChallenges();
+    const challenges = datasetManager.getChallenges(this.chat.challengeLimit);
 
     const modelResponse: ModelResponse = {
       model: this.model,
@@ -25,8 +27,10 @@ export default class ChatWorker {
     this.chat.models.push(modelResponse);
     this.onChange();
 
+    const promptTemplate = new PromptTemplate(this.chat);
+
     for (const challenge of challenges) {
-      const challengePrompt = this.generateChallengePrompt(challenge);
+      const challengePrompt = promptTemplate.renderPromptTemplate(challenge);
       console.log(challengePrompt);
 
       const challengeEntry = this.createChallengeEntry(
@@ -34,7 +38,8 @@ export default class ChatWorker {
         modelResponse
       );
 
-      const code = await this.generateCode(challengePrompt);
+      // const code = await this.generateCode(challengePrompt);
+      const code = challenge.suggestedCode || "";
       challengeEntry.code = code;
       challengeEntry.status = "executing";
       this.onChange();
@@ -47,8 +52,9 @@ export default class ChatWorker {
   }
 
   private async executeCode(challenge: Challenge, code: string) {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    return Math.random() > 0.5;
+    const codeExecutor = CodeExecutor.getInstance();
+    const passesTests = await codeExecutor.passesTests(challenge, code);
+    return passesTests;
   }
 
   private async generateCode(challengePrompt: string): Promise<string> {
@@ -81,10 +87,5 @@ export default class ChatWorker {
     this.onChange();
 
     return challengeEntry;
-  }
-
-  private generateChallengePrompt(challenge: Challenge) {
-    const prompt = this.chat.prompt.replace("[task]", challenge.text);
-    return prompt;
   }
 }

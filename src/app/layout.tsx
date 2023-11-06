@@ -24,6 +24,8 @@ export default function RootLayout({
         )}
       >
         {children}
+
+        <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
       </body>
     </html>
   );

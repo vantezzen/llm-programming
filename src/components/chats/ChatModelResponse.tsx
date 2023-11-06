@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Check, Loader2, SquareCode, X } from "lucide-react";
 import { ScrollArea } from "../ui/scroll-area";
+import { Progress } from "../ui/progress";
 
 function ChatModelResponse({ response }: { response: ModelResponse }) {
   const numSuccess = response.challenges.filter(
@@ -54,11 +55,19 @@ function ChatModelResponse({ response }: { response: ModelResponse }) {
           </div>
         </div>
 
-        <Alert variant="destructive">
-          <AlertTitle>{Math.round(successRate * 100)}% success rate</AlertTitle>
-          <AlertDescription>
-            {numSuccess} of {numError + numSuccess}
-          </AlertDescription>
+        <Alert className="flex gap-3">
+          <div>
+            <Progress value={successRate * 100} className="w-12 h-3" />
+          </div>
+
+          <div>
+            <AlertTitle>
+              {Math.round(successRate * 100)}% success rate
+            </AlertTitle>
+            <AlertDescription>
+              {numSuccess} of {numError + numSuccess}
+            </AlertDescription>
+          </div>
         </Alert>
       </CardContent>
     </Card>
