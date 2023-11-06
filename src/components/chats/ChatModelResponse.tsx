@@ -2,7 +2,7 @@ import { ModelResponse } from "@/lib/types";
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
-import { Check, Loader2, SquareCode, X } from "lucide-react";
+import { Check, Loader2, SquareCode, Trash2, X } from "lucide-react";
 import { Progress } from "../ui/progress";
 import {
   Collapsible,
@@ -13,6 +13,8 @@ import SyntaxHighlighter from "react-syntax-highlighter";
 import { atomOneDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import { cn } from "@/lib/utils";
 import { getSuccessColor } from "@/lib/color";
+import { Button } from "../ui/button";
+import useCurrentChat from "@/lib/hooks/useCurrentChat";
 
 function ChatModelResponse({ response }: { response: ModelResponse }) {
   const numSuccess = response.challenges.filter(
@@ -21,6 +23,8 @@ function ChatModelResponse({ response }: { response: ModelResponse }) {
   const numError = response.challenges.filter(
     (challenge) => challenge.status === "error"
   ).length;
+
+  const [currentChat, setCurrentChat] = useCurrentChat();
 
   const successRate = numSuccess / (numSuccess + numError);
 
@@ -35,7 +39,25 @@ function ChatModelResponse({ response }: { response: ModelResponse }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{response.model}</CardTitle>
+        <CardTitle>
+          <div className="flex justify-between">
+            {response.model}
+            <Button
+              size="icon"
+              variant="destructive"
+              onClick={() => {
+                setCurrentChat({
+                  ...currentChat!,
+                  models: currentChat!.models.filter(
+                    (modelReponse) => modelReponse.id !== response.id
+                  ),
+                });
+              }}
+            >
+              <Trash2 size={16} />
+            </Button>
+          </div>
+        </CardTitle>
       </CardHeader>
 
       <CardContent>
@@ -62,13 +84,56 @@ function ChatModelResponse({ response }: { response: ModelResponse }) {
                       {challenge.name}
                     </AlertTitle>
                     <CollapsibleContent>
-                      <SyntaxHighlighter
-                        language="python"
-                        style={atomOneDark}
-                        wrapLongLines
-                      >
-                        {challenge.code}
-                      </SyntaxHighlighter>
+                      <div className="grid gap-2">
+                        <SyntaxHighlighter
+                          language="python"
+                          style={atomOneDark}
+                          wrapLongLines
+                        >
+                          {challenge.code}
+                        </SyntaxHighlighter>
+                        {challenge.testCaseResults.map((testCaseResult, i) => (
+                          <Collapsible
+                            key={i}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <CollapsibleTrigger>
+                              <Alert
+                                className={cn(
+                                  testCaseResult.status === "success"
+                                    ? "text-emerald-500"
+                                    : "text-red-500"
+                                )}
+                              >
+                                {testCaseResult.status === "success" && (
+                                  <Check
+                                    className="text-emerald-500"
+                                    size={16}
+                                  />
+                                )}
+                                {testCaseResult.status === "error" && (
+                                  <X className="text-red-500" size={16} />
+                                )}
+
+                                <AlertTitle className="text-xs tracking-normal">
+                                  <b>{testCaseResult.status}</b>:{" "}
+                                  {testCaseResult.name}
+                                </AlertTitle>
+
+                                <CollapsibleContent>
+                                  <SyntaxHighlighter
+                                    language="python"
+                                    style={atomOneDark}
+                                    wrapLongLines
+                                  >
+                                    {testCaseResult.output}
+                                  </SyntaxHighlighter>
+                                </CollapsibleContent>
+                              </Alert>
+                            </CollapsibleTrigger>
+                          </Collapsible>
+                        ))}
+                      </div>
                     </CollapsibleContent>
                   </Alert>
                 </CollapsibleTrigger>

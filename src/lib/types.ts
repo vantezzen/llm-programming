@@ -5,18 +5,27 @@ export type DataSet = (typeof DataSets)[number];
 export const Models = ["GPT3"] as const;
 export type Model = (typeof Models)[number];
 
+export const TestCaseResultSchema = z.object({
+  name: z.string(),
+  status: z.enum(["success", "error", "SyntaxError", "AssertionError"]),
+  output: z.string(),
+});
+export type TestCaseResult = z.infer<typeof TestCaseResultSchema>;
+
 export const ModelChallengeResponseSchema = z.object({
   name: z.string(),
   code: z.string(), // Code content returned by model
   status: z.enum(["generating", "executing", "success", "error"]),
   success: z.boolean(),
   output: z.string(),
+  testCaseResults: z.array(TestCaseResultSchema),
 });
 export type ModelChallengeResponse = z.infer<
   typeof ModelChallengeResponseSchema
 >;
 
 export const ModelResponseSchema = z.object({
+  id: z.string(),
   model: z.enum(Models),
   challenges: z.array(ModelChallengeResponseSchema),
 });

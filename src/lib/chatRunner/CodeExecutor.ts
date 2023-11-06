@@ -1,4 +1,4 @@
-import { Challenge } from "../types";
+import { Challenge, TestCaseResult } from "../types";
 import type { PyodideInterface } from "pyodide";
 
 export default class CodeExecutor {
@@ -39,30 +39,54 @@ export default class CodeExecutor {
     });
   }
 
-  async passesTests(challenge: Challenge, code: string) {
+  async passesTests(
+    challenge: Challenge,
+    code: string
+  ): Promise<TestCaseResult[]> {
     await this.waitForPyodide();
     const { pyodide } = this;
     if (!pyodide) throw new Error("Pyodide not loaded");
 
+    let testResults: TestCaseResult[] = [];
     const { testCode } = challenge;
 
     // Run setup code
     await pyodide.runPythonAsync(testCode.setupCode);
 
-    const testResults = await Promise.all(
+    await Promise.all(
       testCode.testList.map(async (testCase) => {
         const testCode = `${code}\n${testCase}`;
 
         try {
-          await pyodide.runPythonAsync(testCode);
-          return true;
-        } catch (error) {
+          const output = await pyodide.runPythonAsync(testCode);
+
+          testResults.push({
+            name: testCase,
+            status: "success",
+            output: output,
+          });
+        } catch (error: any) {
           console.log("CodeEcecutor Error:", challenge.name, code, error);
+
+          let errorStatus = "error";
+          if (error.message.includes("SyntaxError")) {
+            errorStatus = "SyntaxError";
+          }
+          if (error.message.includes("AssertionError")) {
+            errorStatus = "AssertionError";
+          }
+
+          testResults.push({
+            name: testCase,
+            status: errorStatus as any,
+            output: error.message,
+          });
+
           return false;
         }
       })
     );
 
-    return testResults.every((result) => result);
+    return testResults;
   }
 }

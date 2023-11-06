@@ -8,6 +8,7 @@ import {
 import CodeExecutor from "./CodeExecutor";
 import DatasetManager from "./DatasetManager";
 import PromptTemplate from "./PromptTemplate";
+import { v4 as uuid } from "uuid";
 
 export default class ChatWorker {
   constructor(
@@ -23,6 +24,7 @@ export default class ChatWorker {
     const modelResponse: ModelResponse = {
       model: this.model,
       challenges: [],
+      id: uuid(),
     };
     this.chat.models.push(modelResponse);
     this.onChange();
@@ -38,15 +40,18 @@ export default class ChatWorker {
         modelResponse
       );
 
-      // const code = await this.generateCode(challengePrompt);
-      const code = challenge.suggestedCode || "";
+      const code = await this.generateCode(challengePrompt);
+      // const code = challenge.suggestedCode || "";
       challengeEntry.code = code;
       challengeEntry.status = "executing";
       this.onChange();
 
-      const success = await this.executeCode(challenge, code);
-      challengeEntry.success = success;
-      challengeEntry.status = success ? "success" : "error";
+      const testResults = await this.executeCode(challenge, code);
+      challengeEntry.testCaseResults = testResults;
+      challengeEntry.success = testResults.every(
+        (result) => result.status === "success"
+      );
+      challengeEntry.status = challengeEntry.success ? "success" : "error";
       this.onChange();
     }
   }
@@ -58,18 +63,15 @@ export default class ChatWorker {
   }
 
   private async generateCode(challengePrompt: string): Promise<string> {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    return "print('hello world')";
-
-    // const response = await fetch("/api/generate", {
-    //   method: "POST",
-    //   body: JSON.stringify({
-    //     prompt: challengePrompt,
-    //     model: this.model,
-    //   }),
-    // });
-    // const data = await response.json();
-    // return data.response;
+    const response = await fetch("/api/generate", {
+      method: "POST",
+      body: JSON.stringify({
+        prompt: challengePrompt,
+        model: this.model,
+      }),
+    });
+    const data = await response.json();
+    return data.code;
   }
 
   private createChallengeEntry(
@@ -82,6 +84,7 @@ export default class ChatWorker {
       status: "generating",
       success: false,
       output: "",
+      testCaseResults: [],
     };
     modelResponse.challenges.push(challengeEntry);
     this.onChange();
