@@ -6,6 +6,7 @@ import useChatHistory from "@/lib/hooks/useChatHistory";
 import useCurrentChat, { useSetCurrentChat } from "@/lib/hooks/useCurrentChat";
 import { cn } from "@/lib/utils";
 import { Edit2, X } from "lucide-react";
+import { Models } from "@/lib/types";
 
 function ChatLayout({ children }: { children: React.ReactNode }) {
   const [chatHistory, setChatHistory] = useChatHistory();
@@ -88,6 +89,7 @@ function ChatLayout({ children }: { children: React.ReactNode }) {
                     dataset: "MBPP",
                     challengeLimit: -1,
                     models: [],
+                    requestedModels: [...Models],
 
                     createdAt: new Date(),
                     updatedAt: new Date(),

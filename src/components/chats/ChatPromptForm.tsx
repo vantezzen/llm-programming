@@ -11,9 +11,11 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Button } from "../ui/button";
-import { DataSet, DataSets } from "@/lib/types";
+import { DataSet, DataSets, Model, Models } from "@/lib/types";
 import { Slider } from "../ui/slider";
 import DatasetManager from "@/lib/chatRunner/DatasetManager";
+import { MultiSelect } from "../ui/multi-select";
+import TemplatePreview from "./TemplatePreview";
 
 function ChatPromptForm({
   onStart,
@@ -42,6 +44,7 @@ function ChatPromptForm({
             onChange={(e) =>
               setCurrentChat({ ...currentChat!, prompt: e.target.value })
             }
+            className="h-full"
           />
 
           <p className="text-xs font-medium text-zinc-400">
@@ -74,35 +77,56 @@ function ChatPromptForm({
                 </SelectGroup>
               </SelectContent>
             </Select>
-            <div className="flex items-center gap-3">
-              <p className="text-zinc-500 font-medium text-sm">
-                {currentChat?.challengeLimit === -1
-                  ? challengeAmount
-                  : currentChat?.challengeLimit}
-              </p>
 
-              <Slider
-                max={challengeAmount}
-                value={[
-                  (currentChat?.challengeLimit === -1
-                    ? challengeAmount
-                    : currentChat?.challengeLimit) ?? 0,
-                ]}
-                onValueChange={(value) => {
-                  const limit = value[0] === challengeAmount ? -1 : value[0];
-                  setCurrentChat({ ...currentChat!, challengeLimit: limit });
-                }}
-              />
-            </div>
+            <MultiSelect
+              options={
+                Models.map((model) => ({
+                  label: model,
+                  value: model,
+                })) ?? []
+              }
+              selected={currentChat?.requestedModels ?? []}
+              onChange={(value) => {
+                setCurrentChat({
+                  ...currentChat!,
+                  requestedModels: value as Model[],
+                });
+              }}
+            />
           </div>
-          <Button
-            className="w-full"
-            type="submit"
-            onClick={onStart}
-            disabled={isRunning}
-          >
-            Start
-          </Button>
+          <div className="flex items-center gap-3 py-2">
+            <p className="text-zinc-500 font-medium text-sm whitespace-nowrap">
+              {currentChat?.challengeLimit === -1
+                ? challengeAmount
+                : currentChat?.challengeLimit}{" "}
+              challenges
+            </p>
+
+            <Slider
+              max={challengeAmount}
+              value={[
+                (currentChat?.challengeLimit === -1
+                  ? challengeAmount
+                  : currentChat?.challengeLimit) ?? 0,
+              ]}
+              onValueChange={(value) => {
+                const limit = value[0] === challengeAmount ? -1 : value[0];
+                setCurrentChat({ ...currentChat!, challengeLimit: limit });
+              }}
+            />
+          </div>
+
+          <div className="flex gap-3">
+            <TemplatePreview />
+            <Button
+              className="w-full"
+              type="submit"
+              onClick={onStart}
+              disabled={isRunning}
+            >
+              Start
+            </Button>
+          </div>
         </div>
       </div>
     </div>

@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const DataSets = ["MBPP"] as const;
 export type DataSet = (typeof DataSets)[number];
-export const Models = ["GPT3"] as const;
+export const Models = ["GPT3", "GPT4", "LLAMA"] as const;
 export type Model = (typeof Models)[number];
 
 export const TestCaseResultSchema = z.object({
@@ -38,6 +38,8 @@ export const ChatSchema = z.object({
   prompt: z.string(),
   dataset: z.enum(DataSets),
   challengeLimit: z.number(),
+  requestedModels: z.array(z.enum(Models)),
+
   models: z.array(ModelResponseSchema),
 
   createdAt: z.coerce.date(),

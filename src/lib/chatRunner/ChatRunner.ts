@@ -4,7 +4,7 @@ import ChatWorker from "./ChatWorker";
 export default class ChatRunner {
   async runChat(chat: Chat, onChange: () => void) {
     let workers = [];
-    for (const model of Models) {
+    for (const model of chat.requestedModels) {
       const worker = new ChatWorker(chat, model, onChange);
       workers.push(worker);
     }
