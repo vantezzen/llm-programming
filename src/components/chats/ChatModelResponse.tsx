@@ -15,6 +15,14 @@ import { cn } from "@/lib/utils";
 import { getSuccessColor } from "@/lib/color";
 import { Button } from "../ui/button";
 import useCurrentChat from "@/lib/hooks/useCurrentChat";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
+import { ScrollArea } from "../ui/scroll-area";
 
 function ChatModelResponse({ response }: { response: ModelResponse }) {
   const numSuccess = response.challenges.filter(
@@ -64,8 +72,8 @@ function ChatModelResponse({ response }: { response: ModelResponse }) {
         <div className="overflow-y-scroll h-64 mb-3" ref={scrollAreaRef}>
           <div className="grid gap-3">
             {response.challenges.map((challenge, i) => (
-              <Collapsible key={i}>
-                <CollapsibleTrigger>
+              <Dialog key={i}>
+                <DialogTrigger>
                   <Alert className="text-left">
                     {challenge.status === "generating" && (
                       <Loader2 className="animate-spin" size={16} />
@@ -83,61 +91,66 @@ function ChatModelResponse({ response }: { response: ModelResponse }) {
                     <AlertTitle className="text-sm tracking-normal">
                       {challenge.name}
                     </AlertTitle>
-                    <CollapsibleContent>
-                      <div className="grid gap-2">
-                        <SyntaxHighlighter
-                          language="python"
-                          style={atomOneDark}
-                          wrapLongLines
-                        >
-                          {challenge.code}
-                        </SyntaxHighlighter>
+                  </Alert>
+                </DialogTrigger>
+                <DialogContent className="max-w-[80vw]">
+                  <DialogHeader>
+                    <DialogTitle>Run details</DialogTitle>
+                  </DialogHeader>
+                  <div className="grid grid-cols-2 gap-6 items-center">
+                    <ScrollArea className="max-h-[80vh]">
+                      <SyntaxHighlighter
+                        language="python"
+                        style={atomOneDark}
+                        wrapLongLines
+                        customStyle={{
+                          borderRadius: "0.5rem",
+                          padding: "1rem",
+                        }}
+                      >
+                        {challenge.code}
+                      </SyntaxHighlighter>
+                    </ScrollArea>
+
+                    <ScrollArea className="max-h-[80vh]">
+                      <div className="grid gap-3">
                         {challenge.testCaseResults.map((testCaseResult, i) => (
-                          <Collapsible
+                          <Alert
+                            className={cn(
+                              testCaseResult.status === "success"
+                                ? "text-emerald-500"
+                                : "text-red-500"
+                            )}
                             key={i}
-                            onClick={(e) => e.stopPropagation()}
                           >
-                            <CollapsibleTrigger>
-                              <Alert
-                                className={cn(
-                                  testCaseResult.status === "success"
-                                    ? "text-emerald-500"
-                                    : "text-red-500"
-                                )}
+                            {testCaseResult.status === "success" && (
+                              <Check className="text-emerald-500" size={16} />
+                            )}
+                            {testCaseResult.status === "error" && (
+                              <X className="text-red-500" size={16} />
+                            )}
+
+                            <AlertTitle className="text-xs tracking-normal">
+                              <b>{testCaseResult.status}</b>:{" "}
+                              {testCaseResult.name}
+                            </AlertTitle>
+
+                            {testCaseResult.output && (
+                              <SyntaxHighlighter
+                                language="python"
+                                style={atomOneDark}
+                                wrapLongLines
                               >
-                                {testCaseResult.status === "success" && (
-                                  <Check
-                                    className="text-emerald-500"
-                                    size={16}
-                                  />
-                                )}
-                                {testCaseResult.status === "error" && (
-                                  <X className="text-red-500" size={16} />
-                                )}
-
-                                <AlertTitle className="text-xs tracking-normal">
-                                  <b>{testCaseResult.status}</b>:{" "}
-                                  {testCaseResult.name}
-                                </AlertTitle>
-
-                                <CollapsibleContent>
-                                  <SyntaxHighlighter
-                                    language="python"
-                                    style={atomOneDark}
-                                    wrapLongLines
-                                  >
-                                    {testCaseResult.output}
-                                  </SyntaxHighlighter>
-                                </CollapsibleContent>
-                              </Alert>
-                            </CollapsibleTrigger>
-                          </Collapsible>
+                                {testCaseResult.output}
+                              </SyntaxHighlighter>
+                            )}
+                          </Alert>
                         ))}
                       </div>
-                    </CollapsibleContent>
-                  </Alert>
-                </CollapsibleTrigger>
-              </Collapsible>
+                    </ScrollArea>
+                  </div>
+                </DialogContent>
+              </Dialog>
             ))}
           </div>
         </div>
