@@ -10,9 +10,11 @@ export default class CodeCleaner {
     lines.push("");
 
     const start = lines.findIndex((line) => line.startsWith("def "));
-    const end = lines.findIndex(
-      (line, index) => index > start && !/^\s/.test(line)
-    );
+    const end =
+      lines.findIndex(
+        (line, index) =>
+          index > start && !line.startsWith(" ") && line.trim().length > 0
+      ) || lines.length;
 
     const code = lines.slice(start, end).join("\n");
 

@@ -12,6 +12,7 @@ export default class PromptTemplate {
     let prompt = this.chat.prompt;
 
     prompt = this.addTask(prompt, challenge);
+    prompt = this.addHead(prompt, challenge);
     prompt = this.addShots(prompt, challenge);
     prompt = this.addTests(prompt, challenge);
 
@@ -20,6 +21,12 @@ export default class PromptTemplate {
 
   private addTask(prompt: string, challenge: Challenge) {
     prompt = prompt.replace("[task]", challenge.text);
+    return prompt;
+  }
+
+  private addHead(prompt: string, challenge: Challenge) {
+    const head = challenge.codeHead || "";
+    prompt = prompt.replace("[head]", head);
     return prompt;
   }
 

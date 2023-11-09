@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const DataSets = ["MBPP"] as const;
 export type DataSet = (typeof DataSets)[number];
-export const Models = ["GPT3", "GPT4", "LLAMA"] as const;
+export const Models = ["GPT3", "GPT4", "LLAMA", "LLAMA Code"] as const;
 export type Model = (typeof Models)[number];
 
 export const TestCaseResultSchema = z.object({
@@ -58,5 +58,6 @@ export const ChallengeSchema = z.object({
     testList: z.array(z.string()),
   }),
   suggestedCode: z.string().optional(),
+  codeHead: z.string().optional(),
 });
 export type Challenge = z.infer<typeof ChallengeSchema>;

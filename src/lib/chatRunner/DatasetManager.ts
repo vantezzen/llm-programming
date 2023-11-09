@@ -27,6 +27,7 @@ export default class DatasetManager {
         testList: challenge.test_list,
       },
       suggestedCode: challenge.code,
+      codeHead: /def \w+\(.*\):/.exec(challenge.code)?.[0] || "",
     }));
   }
 }

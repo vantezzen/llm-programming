@@ -48,7 +48,8 @@ function ChatPromptForm({
           />
 
           <p className="text-xs font-medium text-zinc-400">
-            Placeholders: "[task]", "[shots:num]" (e.g. "[shots:3]"), "[tests]"
+            Placeholders: "[task]", "[shots:num]" (e.g. "[shots:3]"), "[tests]",
+            "[head]"
           </p>
         </div>
         <div className="space-y-2">
