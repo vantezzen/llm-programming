@@ -8,7 +8,7 @@ export async function POST(request: Request) {
   const { prompt, model } = res;
 
   const llm = getLlm(model);
-  const llmResult = cleanUpCode(await llm.predict(prompt));
+  const llmResult = await llm.predict(prompt);
 
   return Response.json({ code: llmResult });
 }
@@ -32,21 +32,4 @@ function getLlm(model: Model) {
     default:
       throw new Error(`Unknown model ${model}`);
   }
-}
-
-function cleanUpCode(rawResponse: string) {
-  const codeBlockRegex =
-    /```python[^`]*```|```[^`]*```|def\s+[\w_]+\s*\(.*?\)\s*:(?:(?!def\s+[\w_]+\s*\(.*?\)\s*:).)*/gs;
-  // Extract code blocks or standalone function definitions
-  const matches = rawResponse.match(codeBlockRegex);
-
-  if (matches && matches.length > 0) {
-    let cleanedCode = matches[0].replace(/```(python)?/g, "").trim();
-
-    if (/def\s+[\w_]+\s*\(.*?\)\s*:/.test(cleanedCode)) {
-      return cleanedCode;
-    }
-  }
-
-  return "raise Exception('No code found')";
 }

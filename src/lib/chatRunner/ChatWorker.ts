@@ -5,12 +5,15 @@ import {
   ModelChallengeResponse,
   ModelResponse,
 } from "../types";
+import CodeCleaner from "./CodeCleaner";
 import CodeExecutor from "./CodeExecutor";
 import DatasetManager from "./DatasetManager";
 import PromptTemplate from "./PromptTemplate";
 import { v4 as uuid } from "uuid";
 
 export default class ChatWorker {
+  private codeCleaner = new CodeCleaner();
+
   constructor(
     private chat: Chat,
     private model: Model,
@@ -71,7 +74,9 @@ export default class ChatWorker {
       }),
     });
     const data = await response.json();
-    return data.code;
+    const { code } = data;
+
+    return this.codeCleaner.clean(code);
   }
 
   private createChallengeEntry(
