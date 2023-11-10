@@ -1,6 +1,5 @@
 import { OpenAI } from "langchain/llms/openai";
 import { Fireworks } from "langchain/llms/fireworks";
-import { CloudflareWorkersAI } from "langchain/llms/cloudflare_workersai";
 
 import { Model } from "@/lib/types";
 
@@ -30,7 +29,7 @@ function getLlm(model: Model) {
       });
     case "LLAMA Code":
       return new Fireworks({
-        modelName: "accounts/fireworks/models/llama-v2-34b-code-instruct-w8a16",
+        modelName: "accounts/fireworks/models/llama-v2-34b-code-instruct",
         fireworksApiKey: process.env.FIREWORKS_API_KEY,
       });
     default:

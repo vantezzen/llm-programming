@@ -1,14 +1,11 @@
 import { ModelResponse } from "@/lib/types";
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { Alert, AlertTitle } from "../ui/alert";
 import { Check, Loader2, SquareCode, Trash2, X } from "lucide-react";
 import { Progress } from "../ui/progress";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "../ui/collapsible";
+
+
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { atomOneDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import { cn } from "@/lib/utils";
@@ -22,7 +19,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import { ScrollArea } from "../ui/scroll-area";
 
 function ChatModelResponse({ response }: { response: ModelResponse }) {
   const numSuccess = response.challenges.filter(
@@ -93,26 +89,26 @@ function ChatModelResponse({ response }: { response: ModelResponse }) {
                     </AlertTitle>
                   </Alert>
                 </DialogTrigger>
-                <DialogContent className="max-w-[80vw]">
+                <DialogContent className="max-w-[90vw]">
                   <DialogHeader>
                     <DialogTitle>Run details</DialogTitle>
                   </DialogHeader>
                   <div className="grid grid-cols-2 gap-6 items-center">
-                    <ScrollArea className="max-h-[80vh]">
+                    <div className="max-h-[80vh] overflow-auto">
                       <SyntaxHighlighter
                         language="python"
                         style={atomOneDark}
-                        wrapLongLines
                         customStyle={{
                           borderRadius: "0.5rem",
                           padding: "1rem",
+                          overflow: "auto",
                         }}
                       >
                         {challenge.code}
                       </SyntaxHighlighter>
-                    </ScrollArea>
+                    </div>
 
-                    <ScrollArea className="max-h-[80vh]">
+                    <div className="max-h-[80vh] overflow-auto">
                       <div className="grid gap-3">
                         {challenge.testCaseResults.map((testCaseResult, i) => (
                           <Alert
@@ -147,7 +143,7 @@ function ChatModelResponse({ response }: { response: ModelResponse }) {
                           </Alert>
                         ))}
                       </div>
-                    </ScrollArea>
+                    </div>
                   </div>
                 </DialogContent>
               </Dialog>

@@ -1,4 +1,4 @@
-import { Chat, Models } from "../types";
+import { Chat } from "../types";
 import ChatWorker from "./ChatWorker";
 
 export default class ChatRunner {
