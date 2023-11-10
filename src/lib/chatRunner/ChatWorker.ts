@@ -43,9 +43,13 @@ export default class ChatWorker {
         modelResponse
       );
 
-      const code = await this.generateCode(challengePrompt);
+      const { code, rawResponse } = await this.generateCode(
+        challengePrompt,
+        challenge.codeHead
+      );
       // const code = challenge.suggestedCode || "";
       challengeEntry.code = code;
+      challengeEntry.rawResponse = rawResponse;
       challengeEntry.status = "executing";
       this.onChange();
 
@@ -65,7 +69,7 @@ export default class ChatWorker {
     return passesTests;
   }
 
-  private async generateCode(challengePrompt: string): Promise<string> {
+  private async generateCode(challengePrompt: string, codeHead?: string) {
     const response = await fetch("/api/generate", {
       method: "POST",
       body: JSON.stringify({
@@ -74,9 +78,19 @@ export default class ChatWorker {
       }),
     });
     const data = await response.json();
-    const { code } = data;
+    let { code } = data;
+    code = code.replace(/```(python)?\n?/g, "");
 
-    return this.codeCleaner.clean(code);
+    let prefix = "";
+    if (code.startsWith(" ") && this.chat.addHead) {
+      prefix = codeHead + "\n";
+    }
+    const cleanedCode = this.codeCleaner.clean(prefix + code);
+
+    return {
+      code: cleanedCode,
+      rawResponse: code,
+    };
   }
 
   private createChallengeEntry(
@@ -86,10 +100,12 @@ export default class ChatWorker {
     const challengeEntry: ModelChallengeResponse = {
       name: challenge.name,
       code: "",
+      rawResponse: "",
       status: "generating",
       success: false,
       output: "",
       testCaseResults: [],
+      challenge,
     };
     modelResponse.challenges.push(challengeEntry);
     this.onChange();

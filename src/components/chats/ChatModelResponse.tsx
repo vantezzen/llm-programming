@@ -5,7 +5,6 @@ import { Alert, AlertTitle } from "../ui/alert";
 import { Check, Loader2, SquareCode, Trash2, X } from "lucide-react";
 import { Progress } from "../ui/progress";
 
-
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { atomOneDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import { cn } from "@/lib/utils";
@@ -94,7 +93,8 @@ function ChatModelResponse({ response }: { response: ModelResponse }) {
                     <DialogTitle>Run details</DialogTitle>
                   </DialogHeader>
                   <div className="grid grid-cols-2 gap-6 items-center">
-                    <div className="max-h-[80vh] overflow-auto">
+                    <div className="max-h-[80vh] overflow-auto grid gap-3">
+                      <p className="font-bold">Code:</p>
                       <SyntaxHighlighter
                         language="python"
                         style={atomOneDark}
@@ -105,6 +105,20 @@ function ChatModelResponse({ response }: { response: ModelResponse }) {
                         }}
                       >
                         {challenge.code}
+                      </SyntaxHighlighter>
+
+                      <p className="font-bold">Raw:</p>
+
+                      <SyntaxHighlighter
+                        language="python"
+                        style={atomOneDark}
+                        customStyle={{
+                          borderRadius: "0.5rem",
+                          padding: "1rem",
+                          overflow: "auto",
+                        }}
+                      >
+                        {challenge.rawResponse}
                       </SyntaxHighlighter>
                     </div>
 

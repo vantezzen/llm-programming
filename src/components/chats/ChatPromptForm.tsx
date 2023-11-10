@@ -16,6 +16,8 @@ import { Slider } from "../ui/slider";
 import DatasetManager from "@/lib/chatRunner/DatasetManager";
 import { MultiSelect } from "../ui/multi-select";
 import TemplatePreview from "./TemplatePreview";
+import { Switch } from "../ui/switch";
+import { Label } from "../ui/label";
 
 function ChatPromptForm({
   onStart,
@@ -115,6 +117,19 @@ function ChatPromptForm({
                 setCurrentChat({ ...currentChat!, challengeLimit: limit });
               }}
             />
+          </div>
+
+          <div className="flex items-center gap-3 pb-2 justify-center">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="addHeadSwitch"
+                checked={currentChat?.addHead ?? false}
+                onCheckedChange={(value) => {
+                  setCurrentChat({ ...currentChat!, addHead: value });
+                }}
+              />
+              <Label htmlFor="addHeadSwitch">Add head code</Label>
+            </div>
           </div>
 
           <div className="flex gap-3">

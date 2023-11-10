@@ -5,6 +5,18 @@ export type DataSet = (typeof DataSets)[number];
 export const Models = ["GPT3", "GPT4", "LLAMA", "LLAMA Code"] as const;
 export type Model = (typeof Models)[number];
 
+export const ChallengeSchema = z.object({
+  name: z.string(),
+  text: z.string(),
+  testCode: z.object({
+    setupCode: z.string(),
+    testList: z.array(z.string()),
+  }),
+  suggestedCode: z.string().optional(),
+  codeHead: z.string().optional(),
+});
+export type Challenge = z.infer<typeof ChallengeSchema>;
+
 export const TestCaseResultSchema = z.object({
   name: z.string(),
   status: z.enum(["success", "error", "SyntaxError", "AssertionError"]),
@@ -18,7 +30,9 @@ export const ModelChallengeResponseSchema = z.object({
   status: z.enum(["generating", "executing", "success", "error"]),
   success: z.boolean(),
   output: z.string(),
+  rawResponse: z.string(),
   testCaseResults: z.array(TestCaseResultSchema),
+  challenge: ChallengeSchema,
 });
 export type ModelChallengeResponse = z.infer<
   typeof ModelChallengeResponseSchema
@@ -39,6 +53,7 @@ export const ChatSchema = z.object({
   dataset: z.enum(DataSets),
   challengeLimit: z.number(),
   requestedModels: z.array(z.enum(Models)),
+  addHead: z.boolean().default(false),
 
   models: z.array(ModelResponseSchema),
 
@@ -49,15 +64,3 @@ export type Chat = z.infer<typeof ChatSchema>;
 
 export const ChatHistorySchema = z.array(ChatSchema);
 export type ChatHistory = z.infer<typeof ChatHistorySchema>;
-
-export const ChallengeSchema = z.object({
-  name: z.string(),
-  text: z.string(),
-  testCode: z.object({
-    setupCode: z.string(),
-    testList: z.array(z.string()),
-  }),
-  suggestedCode: z.string().optional(),
-  codeHead: z.string().optional(),
-});
-export type Challenge = z.infer<typeof ChallengeSchema>;

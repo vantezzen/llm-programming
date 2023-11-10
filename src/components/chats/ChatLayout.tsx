@@ -90,6 +90,7 @@ function ChatLayout({ children }: { children: React.ReactNode }) {
                     challengeLimit: -1,
                     models: [],
                     requestedModels: [...Models],
+                    addHead: false,
 
                     createdAt: new Date(),
                     updatedAt: new Date(),
