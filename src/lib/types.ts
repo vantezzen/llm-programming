@@ -2,7 +2,13 @@ import { z } from "zod";
 
 export const DataSets = ["MBPP"] as const;
 export type DataSet = (typeof DataSets)[number];
-export const Models = ["GPT3", "GPT4", "LLAMA", "LLAMA Code"] as const;
+export const Models = [
+  "GPT3",
+  "GPT4",
+  "LLAMA",
+  "LLAMA Code",
+  "Starcoder",
+] as const;
 export type Model = (typeof Models)[number];
 
 export const ChallengeSchema = z.object({

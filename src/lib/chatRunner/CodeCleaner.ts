@@ -13,7 +13,9 @@ export default class CodeCleaner {
     const end =
       lines.findIndex(
         (line, index) =>
-          index > start && !line.startsWith(" ") && line.trim().length > 0
+          index > start &&
+          ![" ", "\t"].includes(line[0]) &&
+          line.trim().length > 0
       ) || lines.length;
 
     const code = lines.slice(start, end).join("\n");

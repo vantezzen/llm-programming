@@ -32,6 +32,11 @@ function getLlm(model: Model) {
         modelName: "accounts/fireworks/models/llama-v2-34b-code-instruct",
         fireworksApiKey: process.env.FIREWORKS_API_KEY,
       });
+    case "Starcoder":
+      return new Fireworks({
+        modelName: "accounts/fireworks/models/starcoder-16b-w8a16",
+        fireworksApiKey: process.env.FIREWORKS_API_KEY,
+      });
     default:
       throw new Error(`Unknown model ${model}`);
   }
