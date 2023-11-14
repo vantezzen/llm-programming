@@ -17,7 +17,7 @@ function ChatView() {
     <div className="col-span-2 p-4 space-y-4">
       <div className="grid grid-cols-2 gap-3">
         {currentChat?.models.map((model) => (
-          <ChatModelResponse key={model.model} response={model} />
+          <ChatModelResponse key={model.id} response={model} />
         ))}
       </div>
 

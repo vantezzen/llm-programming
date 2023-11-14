@@ -43,6 +43,17 @@ export default class CodeExecutor {
     challenge: Challenge,
     code: string
   ): Promise<TestCaseResult[]> {
+    if (code.includes("def __init__(")) {
+      // LLAMA loves to override __init__ and it breaks everything
+      return [
+        {
+          name: "def __init__",
+          status: "error",
+          output: "Environment does not support overriding __init__",
+        },
+      ];
+    }
+
     await this.waitForPyodide();
     const { pyodide } = this;
     if (!pyodide) throw new Error("Pyodide not loaded");

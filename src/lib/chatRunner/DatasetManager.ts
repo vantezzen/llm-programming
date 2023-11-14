@@ -15,7 +15,7 @@ export default class DatasetManager {
     }
 
     if (limit === -1) return challenges;
-    return challenges.slice(0, limit);
+    return this.shuffleArray(challenges).slice(0, limit);
   }
 
   getMBPPChallenges(): Challenge[] {
@@ -29,5 +29,9 @@ export default class DatasetManager {
       suggestedCode: challenge.code,
       codeHead: /def \w+\(.*\):/.exec(challenge.code)?.[0] || "",
     }));
+  }
+
+  private shuffleArray<T>(array: T[]): T[] {
+    return array.sort(() => Math.random() - 0.5);
   }
 }

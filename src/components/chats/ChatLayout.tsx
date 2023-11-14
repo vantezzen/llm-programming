@@ -5,8 +5,9 @@ import { v4 as uuid } from "uuid";
 import useChatHistory from "@/lib/hooks/useChatHistory";
 import useCurrentChat, { useSetCurrentChat } from "@/lib/hooks/useCurrentChat";
 import { cn } from "@/lib/utils";
-import { Edit2, X } from "lucide-react";
+import { Download, Edit2, X } from "lucide-react";
 import { Models } from "@/lib/types";
+import { saveAs } from "file-saver";
 
 function ChatLayout({ children }: { children: React.ReactNode }) {
   const [chatHistory, setChatHistory] = useChatHistory();
@@ -15,8 +16,22 @@ function ChatLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="h-screen flex flex-col bg-white">
-      <header className="p-4 bg-white border-b border-gray-200">
+      <header className="p-4 bg-white border-b border-gray-200 flex gap-3 items-center">
         <h1 className="text-xl font-bold text-gray-900">LLM Programming</h1>
+
+        <Button
+          size="sm"
+          variant="secondary"
+          onClick={() => {
+            const data = localStorage.getItem("chatHistory") || "[]";
+            saveAs(
+              new Blob([data], { type: "application/json" }),
+              "chatHistory.json"
+            );
+          }}
+        >
+          <Download size={14} />
+        </Button>
       </header>
       <div className="flex flex-grow overflow-hidden">
         <aside className="w-64 border-r border-gray-200 p-4 overflow-y-auto">
