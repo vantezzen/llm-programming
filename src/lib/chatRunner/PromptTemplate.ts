@@ -11,35 +11,26 @@ export default class PromptTemplate {
   renderPromptTemplate(challenge: Challenge) {
     let prompt = this.chat.prompt;
 
-    prompt = this.addTask(prompt, challenge);
-    prompt = this.addHead(prompt, challenge);
-    prompt = this.addShots(prompt, challenge);
-    prompt = this.addTests(prompt, challenge);
-
-    return prompt;
-  }
-
-  private addTask(prompt: string, challenge: Challenge) {
-    prompt = prompt.replace("[task]", challenge.text);
-    return prompt;
-  }
-
-  private addHead(prompt: string, challenge: Challenge) {
+    // These variables are available in the prompt
+    const task = challenge.text;
     const head = challenge.codeHead || "";
-    prompt = prompt.replace("[head]", head);
-    return prompt;
-  }
+    const shots = (amount: number) => this.getShotsText(amount, challenge);
+    const tests = this.getTestsText(challenge);
 
-  private addShots(prompt: string, challenge: Challenge) {
-    // The prompt may contain a placeholder like "[shots:3]".
-    // This will be replaced with the correct number of shots.
-
-    const shots = prompt.match(/\[shots:(\d+)\]/);
-    if (!shots) return prompt;
-
-    const shotsCount = parseInt(shots[1]);
-    const shotsText = this.getShotsText(shotsCount, challenge);
-    prompt = prompt.replace(/\[shots:\d+\]/, shotsText);
+    // The prompt contains values in brackets, e.g. [task]
+    // These should be "eval"ed to get the value of the variable
+    // while also allowing executing code in the prompt (e.g. "task.replace('a', 'b')")
+    // eslint-disable-next-line no-eval
+    const placeholders = prompt.match(/\[.*?\]/g);
+    if (placeholders) {
+      for (const placeholder of placeholders) {
+        // Remove brackets
+        const placeholderName = placeholder.slice(1, -1);
+        // eslint-disable-next-line no-eval
+        const placeholderValue = eval(placeholderName);
+        prompt = prompt.replace(placeholder, placeholderValue);
+      }
+    }
 
     return prompt;
   }
@@ -70,16 +61,6 @@ export default class PromptTemplate {
   private getRandomChallenge(): Challenge {
     const index = Math.floor(Math.random() * this.allChallenges.length);
     return this.allChallenges[index];
-  }
-
-  private addTests(prompt: string, challenge: Challenge) {
-    const tests = prompt.match(/\[tests\]/);
-    if (!tests) return prompt;
-
-    const testsText = this.getTestsText(challenge);
-    prompt = prompt.replace(/\[tests\]/, testsText);
-
-    return prompt;
   }
 
   private getTestsText(challenge: Challenge) {
