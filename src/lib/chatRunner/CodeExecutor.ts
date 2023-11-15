@@ -1,5 +1,4 @@
 import { Challenge, TestCaseResult } from "../types";
-import type { PyodideInterface } from "pyodide";
 
 export default class CodeExecutor {
   private static instance: CodeExecutor;
@@ -10,33 +9,52 @@ export default class CodeExecutor {
     return CodeExecutor.instance;
   }
 
-  private pyodide: PyodideInterface | null = null;
-  private pyodideReadyListeners: (() => void)[] = [];
   constructor() {
     if (CodeExecutor.instance) {
       throw new Error("Singleton class. Use CodeExecutor.getInstance()");
     }
-
-    this.loadPyodide();
   }
 
   private async loadPyodide() {
-    // Wait until window.loadPyodide is available
-    while (!window.loadPyodide) {
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    }
+    const pyodideWorker = new Worker("/webworker.js");
+    const callbacks: { [id: number]: (data: any) => void } = {};
+    const errorCallbacks: { [id: number]: (data: any) => void } = {};
 
-    this.pyodide = await window.loadPyodide({
-      indexURL: "https://cdn.jsdelivr.net/pyodide/v0.24.1/full/",
-    });
-    this.pyodideReadyListeners.forEach((listener) => listener());
-  }
+    pyodideWorker.onmessage = (event: any) => {
+      const { id, ...data } = event.data;
+      const onSuccess = callbacks[id];
+      const onError = errorCallbacks[id];
+      delete callbacks[id];
+      console.log("CodeExecutor Message:", data);
 
-  private async waitForPyodide() {
-    if (this.pyodide) return;
-    return new Promise<void>((resolve) => {
-      this.pyodideReadyListeners.push(resolve);
-    });
+      if (data.error) {
+        onError(data.error);
+        return;
+      }
+      onSuccess("");
+    };
+    pyodideWorker.onerror = (event: any) => {
+      console.log("CodeExecutor Error:", event);
+    };
+
+    const asyncRun = (() => {
+      let id = 0; // identify a Promise
+      return (script: string, context?: any) => {
+        // the id could be generated more carefully
+        id = (id + 1) % Number.MAX_SAFE_INTEGER;
+        return new Promise<any>((onSuccess, onError) => {
+          callbacks[id] = onSuccess;
+          errorCallbacks[id] = onError;
+          pyodideWorker.postMessage({
+            ...context,
+            python: script,
+            id,
+          });
+        });
+      };
+    })();
+
+    return asyncRun;
   }
 
   async passesTests(
@@ -54,22 +72,21 @@ export default class CodeExecutor {
       ];
     }
 
-    await this.waitForPyodide();
-    const { pyodide } = this;
-    if (!pyodide) throw new Error("Pyodide not loaded");
+    const runPyodide = await this.loadPyodide();
+    if (!runPyodide) throw new Error("Pyodide not loaded");
 
     let testResults: TestCaseResult[] = [];
     const { testCode } = challenge;
 
     // Run setup code
-    await pyodide.runPythonAsync(testCode.setupCode);
+    await runPyodide(testCode.setupCode);
 
     await Promise.all(
       testCode.testList.map(async (testCase) => {
         const testCode = `${code}\n${testCase}`;
 
         try {
-          const output = await pyodide.runPythonAsync(testCode);
+          const output = await runPyodide(testCode);
 
           testResults.push({
             name: testCase,

@@ -18,20 +18,24 @@ function TemplatePreview() {
   const [exampleOutput, setExampleOutput] = React.useState<string>("");
   const [open, setOpen] = React.useState(false);
 
-  useEffect(() => {
-    if (!currentChat || !open) return;
-    const promptTemplate = new PromptTemplate(currentChat);
-    const datasetManager = new DatasetManager(currentChat.dataset);
-    const dataset = datasetManager.getChallenges();
-    const exampleChallenge = dataset[0];
-    if (!exampleChallenge) return;
-
-    const output = promptTemplate.renderPromptTemplate(exampleChallenge);
-    setExampleOutput(output);
-  }, [open]);
-
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={() => {
+        setOpen(!open);
+
+        if (!open && currentChat) {
+          const promptTemplate = new PromptTemplate(currentChat);
+          const datasetManager = new DatasetManager(currentChat.dataset);
+          const dataset = datasetManager.getChallenges();
+          const exampleChallenge = dataset[0];
+          if (!exampleChallenge) return;
+
+          const output = promptTemplate.renderPromptTemplate(exampleChallenge);
+          setExampleOutput(output);
+        }
+      }}
+    >
       <DialogTrigger>
         <Button size="icon" variant="secondary">
           <Eye size={16} />

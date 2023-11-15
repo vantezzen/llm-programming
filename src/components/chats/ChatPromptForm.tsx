@@ -18,6 +18,7 @@ import { MultiSelect } from "../ui/multi-select";
 import TemplatePreview from "./TemplatePreview";
 import { Switch } from "../ui/switch";
 import { Label } from "../ui/label";
+import { useDebounce } from "usehooks-ts";
 
 function ChatPromptForm({
   onStart,
@@ -36,22 +37,34 @@ function ChatPromptForm({
     setChallengeAmount(datasetManager.getChallenges().length);
   }, [currentChat?.dataset]);
 
+  // Store and debounce prompt locally to speed up rendering
+  const [prompt, setPrompt] = useState(currentChat?.prompt ?? "");
+  const debouncedPrompt = useDebounce<string>(prompt, 500);
+  useEffect(() => {
+    if (currentChat?.prompt === prompt) return;
+    setCurrentChat({ ...currentChat!, prompt: debouncedPrompt });
+  }, [debouncedPrompt]);
+  useEffect(() => {
+    if (currentChat?.prompt === prompt) return;
+    setPrompt(currentChat?.prompt ?? "");
+  }, [currentChat?.id]);
+
   return (
     <div className="col-span-2 p-4 space-y-4">
       <div className="grid grid-cols-3 gap-4">
         <div className="w-full col-span-2">
           <Textarea
             placeholder="Type your prompt here."
-            value={currentChat?.prompt}
-            onChange={(e) =>
-              setCurrentChat({ ...currentChat!, prompt: e.target.value })
-            }
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
             className="h-full"
           />
 
           <p className="text-xs font-medium text-zinc-400">
-            Placeholders: "[task]", "[shots:num]" (e.g. "[shots:3]"), "[tests]",
-            "[head]"
+            Placeholders: "[task]", "[shots(num)]" (e.g. "[shots(3)]"),
+            "[tests]", "[head]".
+            <br />
+            You may also include any code (e.g. "[task.replace('a', 'b')]")
           </p>
         </div>
         <div className="space-y-2">
