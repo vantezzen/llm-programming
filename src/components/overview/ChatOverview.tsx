@@ -29,7 +29,9 @@ function ChatOverview({ chat }: { chat: Chat }) {
               >
                 <Progress value={successRate * 100} />
                 <span className="text-gray-600 mt-2">{model.model}</span>
-                <p className="text-sm">{successRate * 100}%</p>
+                <p className="text-sm">
+                  {Math.round(successRate * 100)}% ({model.challenges.length})
+                </p>
               </div>
             );
           })}
