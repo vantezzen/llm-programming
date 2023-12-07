@@ -82,7 +82,10 @@ export default class ChatWorker {
     code = code.replace(/```(python)?\n?/g, "");
 
     let prefix = "";
-    if ([" ", "\t"].includes(code[0]) && this.chat.addHead) {
+    if (
+      (code.startsWith("\t") || code.startsWith("    ")) &&
+      this.chat.addHead
+    ) {
       prefix = codeHead + "\n";
     }
     const cleanedCode = this.codeCleaner.clean(prefix + code);

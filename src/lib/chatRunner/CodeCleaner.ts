@@ -9,6 +9,8 @@ export default class CodeCleaner {
     // Make sure we end with a newline, otherwise the last line might be ignored
     lines.push("");
 
+    console.log("CodeCleaner Before", { rawResponse, lines });
+
     const start = lines.findIndex((line) => line.startsWith("def "));
     const end =
       lines.findIndex(
@@ -20,7 +22,7 @@ export default class CodeCleaner {
 
     const code = lines.slice(start, end).join("\n");
 
-    console.log("CodeCleaner", { rawResponse, code });
+    console.log("CodeCleaner", { rawResponse, code, lines });
 
     return code;
   }
