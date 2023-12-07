@@ -1,7 +1,24 @@
 import { OpenAI } from "langchain/llms/openai";
 import { Fireworks } from "langchain/llms/fireworks";
+import {
+  GoogleVertexAI,
+  GoogleVertexAITextInput,
+} from "langchain/llms/googlevertexai";
 
 import { Model } from "@/lib/types";
+
+const credentials = JSON.parse(
+  Buffer.from(
+    process.env.GOOGLE_VERTEX_AI_WEB_CREDENTIALS!.replace(/\n/g, ""),
+    "base64"
+  ).toString()
+);
+const googleAuth: GoogleVertexAITextInput = {
+  authOptions: {
+    credentials,
+    projectId: credentials.project_id,
+  },
+};
 
 export async function POST(request: Request) {
   const res = await request.json();
@@ -36,6 +53,16 @@ function getLlm(model: Model) {
       return new Fireworks({
         modelName: "accounts/fireworks/models/starcoder-16b-w8a16",
         fireworksApiKey: process.env.FIREWORKS_API_KEY,
+      });
+    case "Google Text Bison":
+      return new GoogleVertexAI({
+        model: "text-bison",
+        ...googleAuth,
+      });
+    case "Google Code Bison":
+      return new GoogleVertexAI({
+        model: "code-bison",
+        ...googleAuth,
       });
     default:
       throw new Error(`Unknown model ${model}`);

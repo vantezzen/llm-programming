@@ -8,6 +8,8 @@ export const Models = [
   "LLAMA",
   "LLAMA Code",
   "Starcoder",
+  "Google Text Bison",
+  "Google Code Bison",
 ] as const;
 export type Model = (typeof Models)[number];
 
