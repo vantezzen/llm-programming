@@ -93,7 +93,7 @@ function ChatLayout({ children }: { children: React.ReactNode }) {
                 <div className="flex gap-3">
                   <Button
                     size="sm"
-                    variant="secondary"
+                    variant="ghost"
                     onClick={(e) => {
                       e.stopPropagation();
                       const name = prompt("Name", chat.name);
@@ -111,7 +111,7 @@ function ChatLayout({ children }: { children: React.ReactNode }) {
 
                   <Button
                     size="sm"
-                    variant="destructive"
+                    variant="ghost"
                     onClick={(e) => {
                       e.stopPropagation();
                       setChatHistory(

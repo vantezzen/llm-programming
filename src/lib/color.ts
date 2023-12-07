@@ -9,3 +9,13 @@ export function getSuccessColor(successRate: number) {
     return "border-green-400";
   }
 }
+
+export function getSuccessBackgroundColor(successRate: number) {
+  if (successRate < 0.25) {
+    return "bg-red-400";
+  } else if (successRate < 0.75) {
+    return "bg-yellow-400";
+  } else {
+    return "bg-green-400";
+  }
+}
