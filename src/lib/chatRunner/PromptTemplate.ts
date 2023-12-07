@@ -1,4 +1,4 @@
-import { Challenge, Chat } from "../types";
+import { Challenge, Chat, commonLibraries } from "../types";
 import DatasetManager from "./DatasetManager";
 
 export default class PromptTemplate {
@@ -16,6 +16,7 @@ export default class PromptTemplate {
     const head = challenge.codeHead || "";
     const shots = (amount: number) => this.getShotsText(amount, challenge);
     const tests = this.getTestsText(challenge);
+    const libraries = commonLibraries;
 
     // The prompt contains values in brackets, e.g. [task]
     // These should be "eval"ed to get the value of the variable

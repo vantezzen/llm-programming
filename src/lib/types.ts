@@ -13,6 +13,8 @@ export const Models = [
 ] as const;
 export type Model = (typeof Models)[number];
 
+export const commonLibraries = ["math", "re", "heapq", "bisect"];
+
 export const ChallengeSchema = z.object({
   name: z.string(),
   text: z.string(),

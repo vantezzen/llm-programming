@@ -20,7 +20,14 @@ export default class CodeCleaner {
           line.trim().length > 0
       ) || lines.length;
 
-    const code = lines.slice(start, end).join("\n");
+    const linesBefore = lines.slice(0, start);
+    const importStatements = linesBefore.filter(
+      (line) => line.startsWith("import ") || line.startsWith("from ")
+    );
+
+    const functionLines = lines.slice(start, end);
+
+    const code = [...importStatements, ...functionLines].join("\n");
 
     console.log("CodeCleaner", { rawResponse, code, lines });
 

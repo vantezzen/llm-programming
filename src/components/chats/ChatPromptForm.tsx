@@ -62,7 +62,7 @@ function ChatPromptForm({
 
           <p className="text-xs font-medium text-zinc-400">
             Placeholders: "[task]", "[shots(num)]" (e.g. "[shots(3)]"),
-            "[tests]", "[head]".
+            "[tests]", "[head]", "[libraries]" (array).
             <br />
             You may also include any code (e.g. "[task.replace('a', 'b')]")
           </p>

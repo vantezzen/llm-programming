@@ -1,4 +1,4 @@
-import { Challenge, TestCaseResult } from "../types";
+import { Challenge, TestCaseResult, commonLibraries } from "../types";
 
 export default class CodeExecutor {
   private static instance: CodeExecutor;
@@ -80,6 +80,12 @@ export default class CodeExecutor {
 
     // Run setup code
     await asyncRun(testCode.setupCode);
+
+    // Import common libraries
+    const libraryImports = commonLibraries
+      .map((library) => `import ${library}`)
+      .join("\n");
+    await asyncRun(libraryImports);
 
     await Promise.all(
       testCode.testList.map(async (testCase) => {
