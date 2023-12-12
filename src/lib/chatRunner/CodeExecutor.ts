@@ -19,6 +19,7 @@ export default class CodeExecutor {
     const pyodideWorker = new Worker("/webworker.js");
     const callbacks: { [id: number]: (data: any) => void } = {};
     const errorCallbacks: { [id: number]: (data: any) => void } = {};
+    const hasCompleted: { [id: number]: boolean } = {};
 
     pyodideWorker.onmessage = (event: any) => {
       const { id, ...data } = event.data;
@@ -32,6 +33,7 @@ export default class CodeExecutor {
         return;
       }
       onSuccess("");
+      hasCompleted[id] = true;
     };
     pyodideWorker.onerror = (event: any) => {
       console.log("CodeExecutor Error:", event);
@@ -45,11 +47,19 @@ export default class CodeExecutor {
         return new Promise<any>((onSuccess, onError) => {
           callbacks[id] = onSuccess;
           errorCallbacks[id] = onError;
+          hasCompleted[id] = false;
+
           pyodideWorker.postMessage({
             ...context,
             python: script,
             id,
           });
+
+          setTimeout(() => {
+            if (!hasCompleted[id]) {
+              onError("Timeout");
+            }
+          }, 10000);
         });
       };
     })();

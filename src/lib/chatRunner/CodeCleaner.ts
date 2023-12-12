@@ -11,7 +11,12 @@ export default class CodeCleaner {
 
     console.log("CodeCleaner Before", { rawResponse, lines });
 
-    const start = lines.findIndex((line) => line.startsWith("def "));
+    const start = lines.findIndex(
+      (line) =>
+        line.startsWith("def ") ||
+        // Google Vertex AI likes to add a space before the def
+        line.startsWith(" def ")
+    );
     const end =
       lines.findIndex(
         (line, index) =>
@@ -26,6 +31,7 @@ export default class CodeCleaner {
     );
 
     const functionLines = lines.slice(start, end);
+    functionLines[0] = functionLines[0].trim(); // Remove space that Google Vertex AI likes to add
 
     const code = [...importStatements, ...functionLines].join("\n");
 
