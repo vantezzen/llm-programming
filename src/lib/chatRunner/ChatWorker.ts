@@ -4,6 +4,7 @@ import {
   Model,
   ModelChallengeResponse,
   ModelResponse,
+  TestCaseResult,
 } from "../types";
 import CodeCleaner from "./CodeCleaner";
 import CodeExecutor from "./CodeExecutor";
@@ -46,7 +47,16 @@ export default class ChatWorker {
       const { code, rawResponse } = await this.generateCode(
         challengePrompt,
         challenge.codeHead
-      );
+      ).catch((error) => {
+        console.log("Generate Code Error", error);
+        challengeEntry.status = "error";
+        this.onChange();
+        return { code: "_ERROR", rawResponse: "" };
+      });
+      if (code === "_ERROR") {
+        continue;
+      }
+
       // const code = challenge.suggestedCode || "";
       challengeEntry.code = code;
       challengeEntry.rawResponse = rawResponse;
@@ -65,18 +75,42 @@ export default class ChatWorker {
 
   private async executeCode(challenge: Challenge, code: string) {
     const codeExecutor = CodeExecutor.getInstance();
-    const passesTests = await codeExecutor.passesTests(challenge, code);
+    const passesTests = await Promise.race([
+      codeExecutor.passesTests(challenge, code),
+      new Promise<TestCaseResult[]>((resolve) => {
+        setTimeout(() => {
+          resolve([
+            {
+              name: "Timeout",
+              status: "error",
+              output: "Timeout while executing code",
+            },
+          ]);
+        }, 20000);
+      }),
+    ]);
     return passesTests;
   }
 
   private async generateCode(challengePrompt: string, codeHead?: string) {
+    const abortController = new AbortController();
+    setTimeout(() => {
+      abortController.abort();
+    }, 40000);
+
     const response = await fetch("/api/generate", {
       method: "POST",
       body: JSON.stringify({
         prompt: challengePrompt,
         model: this.model,
       }),
+      signal: abortController.signal,
     });
+    if (!response.ok) {
+      console.log("Generate Code Error", response);
+      throw new Error("Generate Code Error");
+    }
+
     const data = await response.json();
     let { code } = data;
     code = code.replace(/```(python)?\n?/g, "");

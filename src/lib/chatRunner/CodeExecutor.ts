@@ -89,13 +89,33 @@ export default class CodeExecutor {
     const { testCode } = challenge;
 
     // Run setup code
-    await asyncRun(testCode.setupCode);
+    try {
+      await asyncRun(testCode.setupCode);
+    } catch (error: any) {
+      testResults.push({
+        name: "Setup Code",
+        status: "error",
+        output: error,
+      });
+
+      return testResults;
+    }
 
     // Import common libraries
     const libraryImports = commonLibraries
       .map((library) => `import ${library}`)
       .join("\n");
-    await asyncRun(libraryImports);
+    try {
+      await asyncRun(libraryImports);
+    } catch (error: any) {
+      testResults.push({
+        name: "Common Libraries",
+        status: "error",
+        output: error,
+      });
+
+      return testResults;
+    }
 
     await Promise.all(
       testCode.testList.map(async (testCase) => {

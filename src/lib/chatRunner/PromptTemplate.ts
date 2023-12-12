@@ -48,11 +48,11 @@ export default class PromptTemplate {
 
       usedChallenges.push(shotChallenge.name);
 
-      const shotInfo = `Task: ${shotChallenge.text}\nCode:\n---\n${
-        shotChallenge.suggestedCode
-      }\n---\nTests:\n---\n${
+      const shotInfo = `Task: ${shotChallenge.text}\n---\nTests:\n${
         shotChallenge.testCode.setupCode
-      }\n${shotChallenge.testCode.testList.join("\n")}\n---\n`;
+      }\n${shotChallenge.testCode.testList.join("\n")}\n---\nCode:\n${
+        shotChallenge.suggestedCode
+      }\n---\n`;
       shotsText += shotInfo;
     }
 
