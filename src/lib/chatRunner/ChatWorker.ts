@@ -94,9 +94,9 @@ export default class ChatWorker {
 
   private async generateCode(challengePrompt: string, codeHead?: string) {
     const abortController = new AbortController();
-    setTimeout(() => {
-      abortController.abort();
-    }, 40000);
+    // setTimeout(() => {
+    //   abortController.abort();
+    // }, 40000);
 
     const response = await fetch("/api/generate", {
       method: "POST",

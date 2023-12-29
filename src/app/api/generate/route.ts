@@ -64,6 +64,11 @@ function getLlm(model: Model) {
         model: "code-bison",
         ...googleAuth,
       });
+    case "Google Gemini":
+      return new GoogleVertexAI({
+        model: "gemini-pro",
+        ...googleAuth,
+      });
     default:
       throw new Error(`Unknown model ${model}`);
   }

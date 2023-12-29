@@ -10,6 +10,11 @@ export default function useCurrentChat() {
 
   const currentChat = chatHistory.find((chat) => chat.id === chatId);
   const setCurrentChat = (newChat: Chat) => {
+    // Read current history to prevent overwriting changes from other tabs
+    const chatHistory = JSON.parse(
+      localStorage.getItem("chatHistory") || "[]"
+    ) as Chat[];
+
     const newChatHistory = chatHistory.map((chat) =>
       chat.id === chatId ? newChat : chat
     );
