@@ -10,7 +10,7 @@ export const Models = [
   "Starcoder",
   "Google Text Bison",
   "Google Code Bison",
-  "Google Gemini",
+  // "Google Gemini",
 ] as const;
 export type Model = (typeof Models)[number];
 
@@ -38,7 +38,6 @@ export type TestCaseResult = z.infer<typeof TestCaseResultSchema>;
 export const ModelChallengeResponseSchema = z.object({
   name: z.string(),
   code: z.string(), // Code content returned by model
-  status: z.enum(["generating", "executing", "success", "error"]),
   success: z.boolean(),
   output: z.string(),
   rawResponse: z.string(),
@@ -53,6 +52,8 @@ export const ModelResponseSchema = z.object({
   id: z.string(),
   model: z.enum(Models),
   challenges: z.array(ModelChallengeResponseSchema),
+  pendingChallenges: z.array(ChallengeSchema),
+  inProgressChallenges: z.array(ChallengeSchema),
 });
 export type ModelResponse = z.infer<typeof ModelResponseSchema>;
 
@@ -61,15 +62,9 @@ export const ChatSchema = z.object({
   name: z.string(),
 
   prompt: z.string(),
-  dataset: z.enum(DataSets),
-  challengeLimit: z.number(),
-  requestedModels: z.array(z.enum(Models)),
   addHead: z.boolean().default(false),
 
   models: z.array(ModelResponseSchema),
-
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
 });
 export type Chat = z.infer<typeof ChatSchema>;
 

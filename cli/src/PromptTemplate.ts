@@ -1,12 +1,12 @@
-import { Challenge, Chat, commonLibraries } from "../types";
-import DatasetManager from "./DatasetManager";
+import {
+  type Challenge,
+  type Chat,
+  commonLibraries,
+} from "../../src/lib/types";
+import type ChatManager from "./ChatManager";
 
 export default class PromptTemplate {
-  private allChallenges: Challenge[] = [];
-  constructor(private chat: Chat) {
-    const datasetManager = new DatasetManager(this.chat.dataset);
-    this.allChallenges = datasetManager.getChallenges();
-  }
+  constructor(private chat: Chat, private manager: ChatManager) {}
 
   renderPromptTemplate(challenge: Challenge) {
     let prompt = this.chat.prompt;
@@ -60,8 +60,8 @@ export default class PromptTemplate {
   }
 
   private getRandomChallenge(): Challenge {
-    const index = Math.floor(Math.random() * this.allChallenges.length);
-    return this.allChallenges[index];
+    const index = Math.floor(Math.random() * this.manager.allChallenges.length);
+    return this.manager.allChallenges[index];
   }
 
   private getTestsText(challenge: Challenge) {

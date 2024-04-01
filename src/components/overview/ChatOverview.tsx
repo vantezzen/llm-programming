@@ -15,10 +15,10 @@ function ChatOverview({ chat }: { chat: Chat }) {
         <div className="grid grid-cols-5 gap-4">
           {chat.models.map((model) => {
             const numSuccess = model.challenges.filter(
-              (challenge) => challenge.status === "success"
+              (challenge) => challenge.success
             ).length;
             const numError = model.challenges.filter(
-              (challenge) => challenge.status === "error"
+              (challenge) => !challenge.success
             ).length;
 
             const successRate = numSuccess / (numSuccess + numError);
@@ -36,7 +36,8 @@ function ChatOverview({ chat }: { chat: Chat }) {
                   {model.model}
                   <span className="font-bold ml-2">
                     {Math.round(successRate * 100)}%
-                  </span>
+                  </span>{" "}
+                  ({model.challenges.length})
                 </span>
               </div>
             );

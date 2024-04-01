@@ -2,10 +2,9 @@ import { OpenAI } from "langchain/llms/openai";
 import { Fireworks } from "langchain/llms/fireworks";
 import {
   GoogleVertexAI,
-  GoogleVertexAITextInput,
+  type GoogleVertexAITextInput,
 } from "langchain/llms/googlevertexai";
-
-import { Model } from "@/lib/types";
+import type { Model } from "../../src/lib/types";
 
 const credentials = JSON.parse(
   Buffer.from(
@@ -20,14 +19,10 @@ const googleAuth: GoogleVertexAITextInput = {
   },
 };
 
-export async function POST(request: Request) {
-  const res = await request.json();
-  const { prompt, model } = res;
-
+export async function getCode(prompt: string, model: Model) {
   const llm = getLlm(model);
   const llmResult = await llm.invoke(prompt);
-
-  return Response.json({ code: llmResult });
+  return llmResult;
 }
 
 function getLlm(model: Model) {
@@ -51,7 +46,7 @@ function getLlm(model: Model) {
       });
     case "Starcoder":
       return new Fireworks({
-        modelName: "accounts/fireworks/models/starcoder-16b-w8a16",
+        modelName: "accounts/fireworks/models/starcoder-16b",
         fireworksApiKey: process.env.FIREWORKS_API_KEY,
       });
     case "Google Text Bison":
@@ -64,11 +59,11 @@ function getLlm(model: Model) {
         model: "code-bison",
         ...googleAuth,
       });
-    case "Google Gemini":
-      return new GoogleVertexAI({
-        model: "gemini-pro",
-        ...googleAuth,
-      });
+    // case "Google Gemini":
+    //   return new GoogleVertexAI({
+    //     model: "gemini-pro",
+    //     ...googleAuth,
+    //   });
     default:
       throw new Error(`Unknown model ${model}`);
   }

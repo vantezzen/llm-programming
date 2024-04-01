@@ -21,13 +21,13 @@ import {
 
 function ChatModelResponse({ response }: { response: ModelResponse }) {
   const numSuccess = response.challenges.filter(
-    (challenge) => challenge.status === "success"
+    (challenge) => challenge.success
   ).length;
   const numError = response.challenges.filter(
-    (challenge) => challenge.status === "error"
+    (challenge) => !challenge.success
   ).length;
 
-  const [currentChat, setCurrentChat] = useCurrentChat();
+  const currentChat = useCurrentChat();
 
   const successRate = numSuccess / (numSuccess + numError);
 
@@ -43,23 +43,7 @@ function ChatModelResponse({ response }: { response: ModelResponse }) {
     <Card>
       <CardHeader>
         <CardTitle>
-          <div className="flex justify-between">
-            {response.model}
-            <Button
-              size="icon"
-              variant="destructive"
-              onClick={() => {
-                setCurrentChat({
-                  ...currentChat!,
-                  models: currentChat!.models.filter(
-                    (modelReponse) => modelReponse.id !== response.id
-                  ),
-                });
-              }}
-            >
-              <Trash2 size={16} />
-            </Button>
-          </div>
+          <div className="flex justify-between">{response.model}</div>
         </CardTitle>
       </CardHeader>
 
@@ -70,16 +54,9 @@ function ChatModelResponse({ response }: { response: ModelResponse }) {
               <Dialog key={i}>
                 <DialogTrigger>
                   <Alert className="text-left">
-                    {challenge.status === "generating" && (
-                      <Loader2 className="animate-spin" size={16} />
-                    )}
-                    {challenge.status === "executing" && (
-                      <SquareCode size={16} />
-                    )}
-                    {challenge.status === "success" && (
+                    {challenge.success ? (
                       <Check className="text-emerald-500" size={16} />
-                    )}
-                    {challenge.status === "error" && (
+                    ) : (
                       <X className="text-red-500" size={16} />
                     )}
 

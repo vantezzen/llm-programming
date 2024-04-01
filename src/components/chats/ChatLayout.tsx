@@ -8,10 +8,12 @@ import { cn } from "@/lib/utils";
 import { Download, Edit2, Upload, X } from "lucide-react";
 import { Models } from "@/lib/types";
 import { saveAs } from "file-saver";
+import useChats from "@/lib/ChatContext";
+import ChatRefresh from "../ChatRefresh";
 
 function ChatLayout({ children }: { children: React.ReactNode }) {
-  const [chatHistory, setChatHistory] = useChatHistory();
-  const [currentChat, setCurrentChat] = useCurrentChat();
+  const chatHistory = useChats();
+  const currentChat = useCurrentChat();
   const setSelectedChat = useSetCurrentChat();
 
   return (
@@ -24,51 +26,8 @@ function ChatLayout({ children }: { children: React.ReactNode }) {
           }}
         >
           LLM Programming
+          <ChatRefresh />
         </h1>
-
-        <Button
-          size="sm"
-          variant="secondary"
-          onClick={() => {
-            const data = localStorage.getItem("chatHistory") || "[]";
-            saveAs(
-              new Blob([data], { type: "application/json" }),
-              "chatHistory.json"
-            );
-          }}
-        >
-          <Download size={14} />
-        </Button>
-
-        <input
-          type="file"
-          name="upload"
-          id="upload"
-          className="hidden"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) {
-              const reader = new FileReader();
-              reader.onload = (e) => {
-                const data = e.target?.result as string;
-                try {
-                  const json = JSON.parse(data);
-                  if (Array.isArray(json)) {
-                    setChatHistory(json);
-                  }
-                } catch (e) {
-                  alert("Invalid file");
-                }
-              };
-              reader.readAsText(file);
-            }
-          }}
-        />
-        <Button size="sm" variant="secondary" asChild>
-          <label htmlFor="upload">
-            <Upload size={14} />
-          </label>
-        </Button>
       </header>
       <div className="flex flex-grow overflow-hidden">
         <aside className="w-64 border-r border-gray-200 p-4 overflow-y-auto">
@@ -89,70 +48,9 @@ function ChatLayout({ children }: { children: React.ReactNode }) {
                 onClick={() => setSelectedChat(chat.id)}
               >
                 {chat.name}
-
-                <div className="flex gap-3">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      const name = prompt("Name", chat.name);
-                      if (name) {
-                        setChatHistory(
-                          chatHistory.map((c) =>
-                            c.id === chat.id ? { ...c, name } : c
-                          )
-                        );
-                      }
-                    }}
-                  >
-                    <Edit2 size={12} />
-                  </Button>
-
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setChatHistory(
-                        chatHistory.filter((c) => c.id !== chat.id)
-                      );
-                    }}
-                  >
-                    <X size={12} />
-                  </Button>
-                </div>
               </li>
             ))}
           </ul>
-          <Button
-            className="mt-4 w-full"
-            variant="outline"
-            onClick={() => {
-              const name = prompt("Name");
-              if (name) {
-                setChatHistory([
-                  ...chatHistory,
-                  {
-                    id: uuid(),
-                    name,
-
-                    prompt: "",
-                    dataset: "MBPP",
-                    challengeLimit: -1,
-                    models: [],
-                    requestedModels: [...Models],
-                    addHead: false,
-
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
-                  },
-                ]);
-              }
-            }}
-          >
-            +
-          </Button>
         </aside>
         <main className="w-full overflow-x-auto">{children}</main>
       </div>

@@ -9,8 +9,6 @@ export default class CodeCleaner {
     // Make sure we end with a newline, otherwise the last line might be ignored
     lines.push("");
 
-    console.log("CodeCleaner Before", { rawResponse, lines });
-
     const start = lines.findIndex(
       (line) =>
         line.startsWith("def ") ||
@@ -34,8 +32,6 @@ export default class CodeCleaner {
     functionLines[0] = functionLines[0].trim(); // Remove space that Google Vertex AI likes to add
 
     const code = [...importStatements, ...functionLines].join("\n");
-
-    console.log("CodeCleaner", { rawResponse, code, lines });
 
     return code;
   }

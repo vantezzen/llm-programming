@@ -1,10 +1,8 @@
 import { useLocalStorage } from "usehooks-ts";
 import { ChatHistory } from "../types";
+import useChats from "../ChatContext";
 
 export default function useChatHistory() {
-  const [chatHistory, setChatHistory] = useLocalStorage<ChatHistory>(
-    "chatHistory",
-    []
-  );
-  return [chatHistory, setChatHistory] as const;
+  const chatHistory = useChats();
+  return [chatHistory, () => {}] as const;
 }

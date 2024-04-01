@@ -1,11 +1,13 @@
-"use client";
-import ChatLayout from "@/components/chats/ChatLayout";
-import ChatView from "@/components/chats/ChatView";
-import Overview from "@/components/overview/Overview";
-import useCurrentChat from "@/lib/hooks/useCurrentChat";
+import Dashboard from "@/components/Dashboard";
+import { ChatProvider } from "@/lib/ChatContext";
+import getChats from "@/lib/getChats";
 
-export default function Home() {
-  const [currentChat] = useCurrentChat();
+export default async function Home() {
+  const chats = await getChats();
 
-  return <ChatLayout>{currentChat ? <ChatView /> : <Overview />}</ChatLayout>;
+  return (
+    <ChatProvider value={chats}>
+      <Dashboard />
+    </ChatProvider>
+  );
 }
