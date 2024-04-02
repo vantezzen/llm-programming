@@ -5,6 +5,7 @@ import {
   type GoogleVertexAITextInput,
 } from "langchain/llms/googlevertexai";
 import type { Model } from "../../src/lib/types";
+import { VertexAI } from "@google-cloud/vertexai";
 
 const credentials = JSON.parse(
   Buffer.from(
@@ -20,6 +21,29 @@ const googleAuth: GoogleVertexAITextInput = {
 };
 
 export async function getCode(prompt: string, model: Model) {
+  if (model === "Google Gemini") {
+    // Google Gemini is currently highly rate limited
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    const vertexAI = new VertexAI({
+      project: credentials.project_id,
+      googleAuthOptions: {
+        credentials,
+      },
+      location: "us-central1",
+    });
+    const model = vertexAI.getGenerativeModel({
+      model: "gemini-1.0-pro",
+    });
+    const resp = await model.generateContent({
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+    });
+    const textContent = resp.response.candidates[0].content.parts
+      .map((p) => p.text)
+      .join("");
+    return textContent;
+  }
+
   const llm = getLlm(model);
   const llmResult = await llm.invoke(prompt);
   return llmResult;
@@ -33,7 +57,7 @@ function getLlm(model: Model) {
       });
     case "GPT4":
       return new OpenAI({
-        modelName: "gpt-4-1106-preview",
+        modelName: "gpt-4-turbo-preview",
       });
     case "LLAMA":
       return new Fireworks({
@@ -59,11 +83,6 @@ function getLlm(model: Model) {
         model: "code-bison",
         ...googleAuth,
       });
-    // case "Google Gemini":
-    //   return new GoogleVertexAI({
-    //     model: "gemini-pro",
-    //     ...googleAuth,
-    //   });
     default:
       throw new Error(`Unknown model ${model}`);
   }

@@ -1,6 +1,7 @@
 import useChatHistory from "@/lib/hooks/useChatHistory";
 import React from "react";
 import ChatOverview from "./ChatOverview";
+import OverviewLatex from "./OverviewLatex";
 
 function Overview() {
   const [chats] = useChatHistory();
@@ -12,6 +13,8 @@ function Overview() {
           <ChatOverview key={chat.id} chat={chat} />
         ))}
       </div>
+
+      <OverviewLatex />
     </div>
   );
 }

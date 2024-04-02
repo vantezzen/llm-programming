@@ -10,7 +10,7 @@ export const Models = [
   "Starcoder",
   "Google Text Bison",
   "Google Code Bison",
-  // "Google Gemini",
+  "Google Gemini",
 ] as const;
 export type Model = (typeof Models)[number];
 

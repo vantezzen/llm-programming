@@ -82,7 +82,7 @@ export default class CodeExecutor {
 
         const tmpFile = join(
           import.meta.dir,
-          "/../../data/",
+          "/../../data/tmp",
           `tmp_${uuid()}.py`
         );
         Bun.write(tmpFile, fullCode);
@@ -116,7 +116,7 @@ export default class CodeExecutor {
 
           return false;
         } finally {
-          await unlink(tmpFile);
+          // await unlink(tmpFile);
         }
       })
     );
